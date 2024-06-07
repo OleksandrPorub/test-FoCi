@@ -26,7 +26,7 @@
                 </tr>
             </table>
             <table class="maxDdrivers">
-                <tr v-for="(maxDriver, index) in maxDrivers">
+                <tr v-for="(maxDriver) in maxDrivers">
                     <!-- <th>max{{ index + 1 }}:</th> -->
                     <!-- <td>D{{ maxDriver.drNumber }}=</td> -->
                     <td class="maxDdrivers__discr" >{{ driversNames[maxDriver.drNumber - 1] }} - </td>
