@@ -1,5 +1,9 @@
 <template>
-    <h1 class="header1">Опросник ФоЦи</h1>
+    <article class="intro">
+        <img class="intro__fotoCi" src="/public/images/Zhu_xi.png" />
+        <img class="intro__char" src="/public/images/Qi_character.png" />
+    </article>
+    <h1 class="header1">Опросник Фо Ци</h1>
     <div class="form">
         <ul class="list">
             <li v-for="(item, index) in questions" :class="{ item: true, checked: item.checked }" @click="onItemClick(item)">
@@ -21,11 +25,12 @@
                     <td v-for="value in drivers">{{ value }}</td>
                 </tr>
             </table>
-            <table class="maxDdrivers__table">
+            <table class="maxDdrivers">
                 <tr v-for="(maxDriver, index) in maxDrivers">
-                    <th>max{{ index + 1 }}:</th>
-                    <td>D{{ maxDriver.drNumber }}=</td>
-                    <td>{{ maxDriver.drValue }}</td>
+                    <!-- <th>max{{ index + 1 }}:</th> -->
+                    <!-- <td>D{{ maxDriver.drNumber }}=</td> -->
+                    <td class="maxDdrivers__discr" >{{ driversNames[maxDriver.drNumber - 1] }} - </td>
+                    <td class="maxDdrivers__val">{{ maxDriver.drValue }}</td>
                 </tr>
                 <!-- <tr>
                     <td>{{ maxDriver.drValue }}</td>
@@ -36,6 +41,19 @@
 </template>
 
 <script lang="ts">
+
+// const driversNames=[
+// "Застой Ци",
+// "Застой Крови",
+// "Избыток энергии Ян",
+// "Скопление Сырости и Жара",
+// "Скопление Сырости и Холода",
+// "Пустота Ци",
+// "Пустота энергии Инь",
+// "Пустота энергии Ян",
+// "Пустота Крови"
+// ];
+
 type questionType = {
     num: number;
     text: string;
@@ -103,6 +121,17 @@ export default {
                 { drNumber: 2, drValue: 0 },
                 { drNumber: 3, drValue: 0 },
             ],
+            driversNames:[
+"Застой Ци",
+"Застой Крови",
+"Избыток энергии Ян",
+"Скопление Сырости и Жара",
+"Скопление Сырости и Холода",
+"Пустота Ци",
+"Пустота энергии Инь",
+"Пустота энергии Ян",
+"Пустота Крови"
+],
         };
     },
     methods: {
@@ -213,7 +242,7 @@ export default {
         .item {
             display: flex;
             // width: 100%;
-            gap: 5px;
+            // gap: 5px;
             cursor: pointer;
             background: #ffffff;
             box-shadow: 0 2px 6px rgba(0, 0, 0, 0.548);
@@ -241,8 +270,8 @@ export default {
                 flex: 1 1 auto;
                 // border: 1px solid gray;
                 text-align: left;
-                padding: 8px 2px;
-                line-height: 1.2em;
+                padding: 8px;
+                line-height: 1.3em;
             }
             &__check {
                 display: flex;
@@ -259,8 +288,8 @@ export default {
             &.checked {
                 background: #d4f8ba;
                 // background: #ffe5f9;
-                             
-                .item__text {                    
+
+                .item__text {
                     // background: #d4f8ba;
                     background-clip: border-box;
                 }
@@ -269,7 +298,6 @@ export default {
                     color: rgb(0, 0, 0);
                     // background: #ffbdf1dc;
                     // background: #d4f8ba;
-
                 }
             }
             // &:hover {
@@ -303,12 +331,39 @@ export default {
             }
         }
 
-        .maxDdrivers__table{
+        .maxDdrivers {
             background: #ffffff;
             margin-top: 10px;
             padding: 6px;
             border-radius: 6px;
+            font-size: 18px;
+
+            &__discr {
+               text-align: left;
+               padding-right: 10px;
+            }
+            &__val {
+               border: 1px solid black;
+               width: 1.5em;
+               height: 1.5em;
+               border-radius: 50%;
+            }
+          
         }
+    }
+}
+.intro {
+    width: 100%;
+    max-width: 700px;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    &__fotoCi {
+        width: 200px;
+    }
+    &__char {
+        filter: drop-shadow(1px 1px 3px rgb(255, 200, 48));
+        // width: 100px;
     }
 }
 </style>
