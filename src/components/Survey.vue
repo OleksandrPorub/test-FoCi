@@ -25,23 +25,29 @@
                     <td v-for="value in drivers">{{ value }}</td>
                 </tr>
             </table>
-            <table class="maxDdrivers">
-                <tr v-for="(maxDriver) in maxDrivers">
-                    <!-- <th>max{{ index + 1 }}:</th> -->
-                    <!-- <td>D{{ maxDriver.drNumber }}=</td> -->
-                    <td class="maxDdrivers__discr" >{{ driversNames[maxDriver.drNumber - 1] }} - </td>
-                    <td class="maxDdrivers__val">{{ maxDriver.drValue }}</td>
+            <!-- <table class="maxDdrivers">
+                <tr v-for="maxDriver in maxDrivers">
+                    <td class="maxDdrivers__discr">{{ driversNames[maxDriver.drNumber - 1] }} -</td>
+                    <td>
+                        <span class="maxDdrivers__val">{{ maxDriver.drValue }}</span>
+                    </td>
                 </tr>
-                <!-- <tr>
-                    <td>{{ maxDriver.drValue }}</td>
-                </tr> -->
+            </table> -->
+            <table class="maxDdrivers maxDdrivers-improoved">
+                <tr v-for="maxDriverImpr in maxDriversImpr">
+                    <td class="maxDdrivers__discr">
+                        <span class="driversItem" v-for="dr in maxDriverImpr.drs">{{ driversNames[dr - 1] }}</span>
+                    </td>
+                    <td>
+                        <span class="maxDdrivers__val">{{ maxDriverImpr.val }}</span>
+                    </td>
+                </tr>
             </table>
         </div>
     </div>
 </template>
 
 <script lang="ts">
-
 // const driversNames=[
 // "Застой Ци",
 // "Застой Крови",
@@ -60,6 +66,12 @@ type questionType = {
     checked: boolean;
     drivers: number[];
 };
+type maxDriverType = {
+    drs: number[];
+    val: number;
+};
+// type maxDriversImprType=maxDriverType[];
+
 export default {
     data() {
         return {
@@ -121,38 +133,159 @@ export default {
                 { drNumber: 2, drValue: 0 },
                 { drNumber: 3, drValue: 0 },
             ],
-            driversNames:[
-"Застой Ци",
-"Застой Крови",
-"Избыток энергии Ян",
-"Скопление Сырости и Жара",
-"Скопление Сырости и Холода",
-"Пустота Ци",
-"Пустота энергии Инь",
-"Пустота энергии Ян",
-"Пустота Крови"
-],
+            maxDriversImpr: [{ drs: [1], val: 0 }],
+            driversNames: [
+                "Застой Ци",
+                "Застой Крови",
+                "Избыток энергии Ян",
+                "Скопление Сырости и Жара",
+                "Скопление Сырости и Холода",
+                "Пустота Ци",
+                "Пустота энергии Инь",
+                "Пустота энергии Ян",
+                "Пустота Крови",
+            ],
         };
     },
     methods: {
         onItemClick(item: questionType) {
-            // this.questions[index].checked = !this.questions[index].checked;
-
-            // this.questions.forEach((item) => {
-            //     if (item.checked) {
-            //         item.drivers.forEach((drNum) => {
-
-            //             this.drivers[drNum - 1] = this.drivers[drNum - 1] + 1;
-            //         });
-            //     }
-            // });
-
             item.drivers.forEach((dr) => {
                 item.checked ? this.drivers[dr - 1]-- : this.drivers[dr - 1]++;
             });
             item.checked = !item.checked;
+        },
 
-            // console.log(drives);
+        calcMaxDrivers() {
+            let maxDriver1 = 0;
+            let maxIndex1 = 0;
+            let maxDriver2 = 0;
+            let maxIndex2 = 0;
+            let maxDriver3 = 0;
+            let maxIndex3 = 0;
+
+            this.drivers.forEach((driver, index) => {
+                if (driver > maxDriver1) {
+                    maxDriver1 = driver;
+                    maxIndex1 = index;
+                }
+            });
+            this.drivers.forEach((driver, index) => {
+                if (maxIndex1 != index && driver > maxDriver2) {
+                    maxDriver2 = driver;
+                    maxIndex2 = index;
+                }
+            });
+            this.drivers.forEach((driver, index) => {
+                if (maxIndex2 != index && maxIndex1 != index && driver > maxDriver3) {
+                    maxDriver3 = driver;
+                    maxIndex3 = index;
+                }
+            });
+
+            this.maxDrivers = [
+                { drNumber: maxIndex1 + 1, drValue: maxDriver1 },
+                { drNumber: maxIndex2 + 1, drValue: maxDriver2 },
+                { drNumber: maxIndex3 + 1, drValue: maxDriver3 },
+            ];
+        },
+
+        calcMaxDriversImpr() {
+            // let maxDriver1 = 0;
+            // let maxIndex1 = 0;
+            // let maxDriver2 = 0;
+            // let maxIndex2 = 0;
+            // let maxDriver3 = 0;
+            // let maxIndex3 = 0;
+            let peaksCounter = 0;
+            let exceptIndexes: number[] = [];
+
+            let maxDriver: maxDriverType = { drs: [1], val: 0 };
+            this.maxDriversImpr = [{ drs: [1], val: 0 }];
+            let maxVal = 0;
+            let maxIndex = 0;
+
+            this.drivers.forEach((driver, index) => {
+                if (driver > maxVal) {
+                    maxVal = driver;
+                    maxDriver = { drs: [index + 1], val: driver };
+                    maxIndex = index;
+                }
+            });
+            exceptIndexes.push(maxIndex);
+            peaksCounter++;
+            this.drivers.forEach((driver, index) => {
+                if (!exceptIndexes.includes(index) && driver == maxVal) {
+                    maxDriver.drs.push(index + 1);
+                    exceptIndexes.push(index);
+                    peaksCounter++;
+                }
+            });
+            this.maxDriversImpr = [{ drs: [...maxDriver.drs], val: maxDriver.val }];
+
+            if (peaksCounter < 4) {
+                maxDriver = { drs: [1], val: 0 };
+                maxVal = 0;
+                this.drivers.forEach((driver, index) => {
+                    if (!exceptIndexes.includes(index) && driver > maxVal) {
+                        maxVal = driver;
+                        maxDriver = { drs: [index + 1], val: driver };
+                        maxIndex = index;
+                    }
+                });
+                exceptIndexes.push(maxIndex);
+                peaksCounter++;
+                this.drivers.forEach((driver, index) => {
+                    if (!exceptIndexes.includes(index) && driver == maxVal) {
+                        maxDriver.drs.push(index + 1);
+                        exceptIndexes.push(index);
+                        peaksCounter++;
+                    }
+                });
+                this.maxDriversImpr.push({ drs: [...maxDriver.drs], val: maxDriver.val });
+            }
+
+            if (peaksCounter < 4) {
+                maxDriver = { drs: [1], val: 0 };
+                maxVal = 0;
+                this.drivers.forEach((driver, index) => {
+                    if (!exceptIndexes.includes(index) && driver > maxVal) {
+                        maxVal = driver;
+                        maxDriver = { drs: [index + 1], val: driver };
+                        maxIndex = index;
+                    }
+                });
+                exceptIndexes.push(maxIndex);
+                peaksCounter++;
+                this.drivers.forEach((driver, index) => {
+                    if (!exceptIndexes.includes(index) && driver == maxVal) {
+                        maxDriver.drs.push(index + 1);
+                        exceptIndexes.push(index);
+                        peaksCounter++;
+                    }
+                });
+                this.maxDriversImpr.push({ drs: [...maxDriver.drs], val: maxDriver.val });
+            }
+
+            // this.drivers.forEach((driver, index) => {
+            //   if((this.maxDriversImpr.length>=3)||(this.maxDriversImpr.length==2 && peaksCounter>4)){
+
+            //   }
+
+            // if (driver = maxDriver.val) {
+            //     maxDriver.drs.push(index+1);
+
+            //     exceptIndexes.push(index);
+            //     peaksCounter++;
+
+            // }
+            // if (driver > maxDriver.val) {
+            //     this.maxDriversImpr.push(maxDriver);
+            //     maxDriver={drs:[index+1],val:driver}
+
+            //     exceptIndexes.push(index);
+            //     peaksCounter++;
+            // }
+            // });
         },
     },
 
@@ -168,37 +301,8 @@ export default {
     watch: {
         drivers: {
             handler() {
-                let maxDriver1 = 0;
-                let maxIndex1 = 0;
-                let maxDriver2 = 0;
-                let maxIndex2 = 0;
-                let maxDriver3 = 0;
-                let maxIndex3 = 0;
-
-                this.drivers.forEach((driver, index) => {
-                    if (driver > maxDriver1) {
-                        maxDriver1 = driver;
-                        maxIndex1 = index;
-                    }
-                });
-                this.drivers.forEach((driver, index) => {
-                    if (maxIndex1 != index && driver > maxDriver2) {
-                        maxDriver2 = driver;
-                        maxIndex2 = index;
-                    }
-                });
-                this.drivers.forEach((driver, index) => {
-                    if (maxIndex2 != index && maxIndex1 != index && driver > maxDriver3) {
-                        maxDriver3 = driver;
-                        maxIndex3 = index;
-                    }
-                });
-
-                this.maxDrivers = [
-                    { drNumber: maxIndex1 + 1, drValue: maxDriver1 },
-                    { drNumber: maxIndex2 + 1, drValue: maxDriver2 },
-                    { drNumber: maxIndex3 + 1, drValue: maxDriver3 },
-                ];
+                this.calcMaxDrivers();
+                this.calcMaxDriversImpr();
             },
             deep: true,
         },
@@ -316,6 +420,7 @@ export default {
             margin-top: 30px;
             padding: 6px;
             background: #ffffff;
+            opacity: 0.8;
 
             th,
             td {
@@ -337,18 +442,41 @@ export default {
             padding: 6px;
             border-radius: 6px;
             font-size: 18px;
-
+            border-collapse: collapse;
+            td {
+                padding: 6px 4px;
+            }
             &__discr {
-               text-align: left;
-               padding-right: 10px;
+                text-align: left;
+                padding-right: 10px;
             }
             &__val {
-               border: 1px solid black;
-               width: 1.5em;
-               height: 1.5em;
-               border-radius: 50%;
+                display: inline-block;
+                border: 1px solid black;
+                width: 1.5em;
+                height: 1.5em;
+                border-radius: 50%;
             }
-          
+
+            &.maxDdrivers-improoved {
+                border-radius: 0;
+                .maxDdrivers__val {
+                    background: #fff9a7;
+                    font-weight: 600;
+                }
+                td {
+                    border: 1px solid rgb(109, 109, 109);
+                    border-width: 1px 0;
+                }
+                .driversItem {
+                    display: inline-block;
+                    background: #525252;
+                    color: rgb(253, 255, 139);
+                    margin: 1px 5px 2px 0;
+                    padding: 0px 8px 2px;
+                    border-radius: 6px;
+                }
+            }
         }
     }
 }
